@@ -30,7 +30,7 @@ createDepartment = (name) => {
     },
     function(err, res) {
       if (err) throw err;
-      console.log(res.affectedRows + ' product inserted!\n');
+      console.log(res.affectedRows + ' department inserted!\n');
     }
   );
 };
@@ -44,4 +44,31 @@ getDepartments = () => {
   });
 };
 
-getDepartments();
+// Role routes
+
+// Create role
+createRole = (title, salary, department_id) => {
+  console.log('Inserting a new role...\n');
+
+  const query = connection.query(
+    'INSERT INTO roles SET ?',
+    {
+      title: title,
+      salary: salary,
+      department_id: department_id
+    },
+    function(err, res) {
+      if (err) throw err;
+      console.log(res.affectedRows + ' role inserted!\n');
+    }
+  )
+}
+
+// View all roles 
+getRoles = () => {
+  connection.query('SELECT * FROM roles', function(err, res) {
+    if (err) throw err;
+    console.log(res);
+    connection.end();
+  });
+};

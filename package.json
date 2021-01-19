@@ -10,7 +10,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "migrate": "mysql -u root -p employeesDB < db/schema.sql"
+    "migrate": "mysql -u root -p employeesDB < db/schema.sql",
+    "seed": "mysql -u root -p employeesDB < db/seed.sql"
   },
   "repository": {
     "type": "git",
