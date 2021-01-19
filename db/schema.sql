@@ -1,0 +1,11 @@
+DROP DATABASE IF EXISTS employeesDB;
+CREATE DATABASE employeesDB;
+USE employeesDB;
+
+DROP TABLE IF EXISTS departments;
+
+CREATE TABLE departments(
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(30),
+  PRIMARY KEY(id)
+);

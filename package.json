@@ -1,0 +1,25 @@
+{
+  "name": "employee-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "dependencies": {
+    "mysql2": "^2.2.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "migrate": "mysql -u root -p employeesDB < db/schema.sql"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/calvinj24/employee-tracker.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/calvinj24/employee-tracker/issues"
+  },
+  "homepage": "https://github.com/calvinj24/employee-tracker#readme"
+}
