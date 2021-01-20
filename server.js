@@ -22,6 +22,11 @@ const dep = new Department(connection);
 const role = new Role(connection);
 const emp = new Employee(connection);
 
+// populate choice arrays
+const depArr = dep.getAll();
+const roleArr = role.getAll();
+const empArr= emp.getAll();
+
 // prompts
 newDepartment = () => {
   inquirer
@@ -33,6 +38,7 @@ newDepartment = () => {
   ])
   .then(answer => {
     dep.insert(answer.depName);
+    setTimeout(afterPrompt, 3000)
   })
 }
 
@@ -57,7 +63,7 @@ newRole = (choices) => {
     ])
     .then(answer => {
       role.insert(answer.title, answer.salary, answer.depID);
-      resolve();
+      setTimeout(afterPrompt, 3000)
     })
 }
 
@@ -86,12 +92,13 @@ newEmployee = (roles, emps) => {
     }
   ])
   .then(answer => {
+    console.log(emps);
     emp.insert(answer.firstName, answer.lastName, answer.roleID, answer.manID);
+    setTimeout(afterPrompt, 3000);
   })
-}
+};
 
-updateEmployee = (roles, emps) => {
-  console.log(emps)
+updateEmployee = (emps, roles) => {
   inquirer
   .prompt([
     {
@@ -109,16 +116,13 @@ updateEmployee = (roles, emps) => {
   ])
   .then(answers => {
     emp.updateRole(answers.employee, answers.role);
+    setTimeout(afterPrompt, 3000);
+    return;
   })
-}
+};
 
-// following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
-promptStart = () => {
-  let roles = role.getAll();
-  let employees = emp.getAll();
-  let departments = dep.getAll();
-  inquirer
-  .prompt([
+prompt = () => {
+  return inquirer.prompt([
     {
       type: 'list',
       name: 'action',
@@ -134,37 +138,68 @@ promptStart = () => {
       ]
     }
   ])
+}
+
+getResponse = (answer) => {
+  
+  switch(answer.action) {
+    case 1:
+      dep.printAll();
+      setTimeout(afterPrompt, 3000);
+      break;
+    case 2:
+      role.printAll();
+      setTimeout(afterPrompt, 3000);
+      break;
+    case 3:
+      emp.printAll();
+      setTimeout(afterPrompt, 3000);
+      break;
+    case 4:
+      newDepartment();
+      break;
+    case 5:
+      newRole(depArr);
+      break;
+    case 6:
+      newEmployee(roleArr, empArr);
+      break;
+    case 7:
+      updateEmployee(empArr, roleArr);
+      break;
+    default:
+      return;
+  }
+}
+
+afterPrompt = () => {
+  inquirer
+  .prompt([
+    {
+      name: 'continue',
+      type: 'confirm',
+      message: 'Would you like to continue?'
+    }
+  ])
   .then(answer => {
-    switch(answer.action) {
-      case 1:
-        dep.printAll();
-        break;
-      case 2:
-        role.printAll();
-        break;
-      case 3:
-        emp.printAll();
-        break;
-      case 4:
-        newDepartment();
-        break;
-      case 5:
-        choices = dep.getAll();
-        newRole(departments);
-        break;
-      case 6:
-        newEmployee(roles, employees);
-        break;
-      case 7:
-        updateEmployee(roles, employees);
-        break;
+    if (answer.continue) {
+      startPrompt();
+    } else {
+      connection.end();
     }
   })
-}
+};
+
+startPrompt = () => {
+  prompt()
+  .then(answer => {
+    getResponse(answer)
+  })
+};
 
 // start connection
 connection.connect(err => {
   if (err) throw err;
   console.log('connected as id ' + connection.threadId);
-  promptStart();
+  startPrompt()
 });
