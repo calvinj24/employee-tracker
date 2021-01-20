@@ -4,7 +4,7 @@
 Employee Tracker is a command-line content management system for business owners to track and manage their departments, roles, and employees. This application uses a mysql database as well as inquirer to prompt the user questions.
 
 ### Screenshot
-<img src='./assets/screenshot.img'>
+<img src='./assets/screenshot.png'>
 
 <br/>
 
