@@ -4,6 +4,9 @@ const mysql = require('mysql2');
 const Department = require('./lib/department');
 const Role = require('./lib/roles');
 const Employee = require('./lib/employees');
+const { async } = require('rxjs');
+const { resolve } = require('path');
+const { rejects } = require('assert');
 
 // create the connection to database
 const connection = mysql.createConnection({
@@ -33,28 +36,32 @@ newDepartment = () => {
   })
 }
 
-newRole = () => {
+newRole = (choices) => {
+  
   inquirer
-  .prompt([
-    {
-      name: 'title',
-      message: 'What is the role title?'
-    },
-    {
-      name: 'salary',
-      message: 'What is the salary for the role?'
-    },
-    {
-      name: 'depID',
-      message: 'What is the department ID for the role?'
-    }
-  ])
-  .then(answer => {
-    role.insert(answer.title, answer.salary, answer.depID);
-  })
+    .prompt([
+      {
+        name: 'title',
+        message: 'What is the role title?'
+      },
+      {
+        name: 'salary',
+        message: 'What is the salary for the role?'
+      },
+      {
+        type: 'list',
+        name: 'depID',
+        message: 'What is the department ID for the role?',
+        choices: choices
+      }
+    ])
+    .then(answer => {
+      role.insert(answer.title, answer.salary, answer.depID);
+      resolve();
+    })
 }
 
-newEmployee = () => {
+newEmployee = (roles, emps) => {
   inquirer
   .prompt([
     {
@@ -66,13 +73,16 @@ newEmployee = () => {
       message: 'Employee Last Name:'
     },
     {
+      type: 'list',
       name: 'roleID',
       message: 'Employee Role ID:',
+      choices: roles
     },
     {
+      type: 'list',
       name: 'manID',
       message: 'Employee Manager ID:',
-      default: null
+      choices: emps
     }
   ])
   .then(answer => {
@@ -80,8 +90,33 @@ newEmployee = () => {
   })
 }
 
+updateEmployee = (roles, emps) => {
+  console.log(emps)
+  inquirer
+  .prompt([
+    {
+      type: 'list',
+      name: 'employee',
+      message: 'Which employee would you like to update?',
+      choices: emps
+    },
+    {
+      type: 'list',
+      name: 'role',
+      message: 'What would you like to change their role to?',
+      choices: roles
+    }
+  ])
+  .then(answers => {
+    emp.updateRole(answers.employee, answers.role);
+  })
+}
+
 // following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
 promptStart = () => {
+  let roles = role.getAll();
+  let employees = emp.getAll();
+  let departments = dep.getAll();
   inquirer
   .prompt([
     {
@@ -89,39 +124,45 @@ promptStart = () => {
       name: 'action',
       message: 'What would you like to do?',
       choices: [
-        { key: 1, name: 'view all departments'},
-        { key: 2, name: 'view all roles'},
-        { key: 3, name: 'view all employees'},
-        { key: 4, name: 'add a department'},
-        { key: 5, name: 'add a role'},
-        { key: 5, name: 'add an employee'}
+        { value: 1, name: 'view all departments'},
+        { value: 2, name: 'view all roles'},
+        { value: 3, name: 'view all employees'},
+        { value: 4, name: 'add a department'},
+        { value: 5, name: 'add a role'},
+        { value: 6, name: 'add an employee'},
+        { value: 7, name: 'update employee role'}
       ]
     }
   ])
   .then(answer => {
     switch(answer.action) {
-      case 'view all departments':
+      case 1:
         dep.printAll();
         break;
-      case 'view all roles':
+      case 2:
         role.printAll();
         break;
-      case 'view all employees':
+      case 3:
         emp.printAll();
         break;
-      case 'add a department':
+      case 4:
         newDepartment();
         break;
-      case 'add a role':
-        newRole();
+      case 5:
+        choices = dep.getAll();
+        newRole(departments);
         break;
-      case 'add an employee':
-        newEmployee();
+      case 6:
+        newEmployee(roles, employees);
+        break;
+      case 7:
+        updateEmployee(roles, employees);
         break;
     }
   })
 }
 
+// start connection
 connection.connect(err => {
   if (err) throw err;
   console.log('connected as id ' + connection.threadId);
