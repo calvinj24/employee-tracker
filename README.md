@@ -28,9 +28,9 @@ Employee Tracker is a command-line content management system for business owners
 
 <br/>
 
-## Link to GitHub Page
-https://github.com/calvinj24/employee-tracker
-
+## Links
+* GitHub: https://github.com/calvinj24/employee-tracker
+* Video Walk Through: https://drive.google.com/file/d/1JyUKUbiX5blEF6xcagL1WtiGr_L5gjr2/view
 <br/>
 
 ## Contact Info
