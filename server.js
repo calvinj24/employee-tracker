@@ -4,9 +4,6 @@ const mysql = require('mysql2');
 const Department = require('./lib/department');
 const Role = require('./lib/roles');
 const Employee = require('./lib/employees');
-const { async } = require('rxjs');
-const { resolve } = require('path');
-const { rejects } = require('assert');
 
 // create the connection to database
 const connection = mysql.createConnection({
@@ -38,6 +35,8 @@ newDepartment = () => {
   ])
   .then(answer => {
     dep.insert(answer.depName);
+    //update deparment choice array
+    depArr.push({value: (depArr.length+1), name: answer.depName})
     setTimeout(afterPrompt, 3000)
   })
 }
@@ -63,6 +62,7 @@ newRole = (choices) => {
     ])
     .then(answer => {
       role.insert(answer.title, answer.salary, answer.depID);
+      roleArr.push({value: (roleArr.length+1), name: answer.title});
       setTimeout(afterPrompt, 3000)
     })
 }
@@ -94,6 +94,7 @@ newEmployee = (roles, emps) => {
   .then(answer => {
     console.log(emps);
     emp.insert(answer.firstName, answer.lastName, answer.roleID, answer.manID);
+    empArr.push({value: (empArr.length+1), name: answer.firstName + ' ' + answer.lastName});
     setTimeout(afterPrompt, 3000);
   })
 };
@@ -200,6 +201,7 @@ startPrompt = () => {
 // start connection
 connection.connect(err => {
   if (err) throw err;
-  console.log('connected as id ' + connection.threadId);
+  console.log('connected as id ' + connection.threadId +'\n');
+  console.log('Welcome to Employee Tracker!\n');
   startPrompt()
 });
