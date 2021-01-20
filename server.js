@@ -1,6 +1,10 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 
+const { Department , getDepartments } = require('./lib/department');
+const { Role , getRoles } = require('./lib/roles');
+const { Employee , getEmployees } = require('./lib/employees');
+
 // create the connection to database
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -13,93 +17,32 @@ const connection = mysql.createConnection({
 connection.connect(err => {
   if (err) throw err;
   console.log('connected as id ' + connection.threadId);
-  //afterConnection();
+  //promptStart();
 });
 
 
-// Department funtions
-
-// Create department
-createDepartment = (name) => {
-  console.log('Inserting a new department...\n');
-  
-  const query = connection.query(
-    'INSERT INTO departments SET ?',
+// following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
+promptStart = () => {
+  inquirer
+  .prompt([
     {
-      name: name
-    },
-    function(err, res) {
-      if (err) throw err;
-      console.log(res.affectedRows + ' department inserted!\n');
+      type: 'list',
+      name: 'action',
+      message: 'What would you like to do?',
+      choices: [
+        { key: 1, name: 'view all departments'},
+        { key: 2, name: 'view all roles'},
+        { key: 3, name: 'view all employees'}
+      ]
     }
-  );
-};
-
-// View all departments 
-getDepartments = () => {
-  connection.query('SELECT * FROM departments', function(err, res) {
-    if (err) throw err;
-    console.log(res);
-    connection.end();
-  });
-};
-
-// Role functions
-
-// Create role
-createRole = (title, salary, department_id) => {
-  console.log('Inserting a new role...\n');
-
-  const query = connection.query(
-    'INSERT INTO roles SET ?',
-    {
-      title: title,
-      salary: salary,
-      department_id: department_id
-    },
-    function(err, res) {
-      if (err) throw err;
-      console.log(res.affectedRows + ' role inserted!\n');
+  ])
+  .then(answer => {
+    if (answer.action === 'view all departments') {
+      getDepartments(connection);
+    } else if (answer.action === 'view all roles') {
+      getRoles();
+    } else if (answer.action === 'view all employees') {
+      getEmployees();
     }
-  )
+  })
 }
-
-// View all roles 
-getRoles = () => {
-  connection.query('SELECT * FROM roles', function(err, res) {
-    if (err) throw err;
-    console.log(res);
-    connection.end();
-  });
-};
-
-// Employee functions
-// Create employee
-createRole = (first_name, last_name, role_id, manager_id) => {
-  console.log('Inserting a new employee...\n');
-
-  const query = connection.query(
-    'INSERT INTO roles SET ?',
-    {
-      first_name: first_name,
-      last_name: last_name,
-      role_id: role_id,
-      manager_id: manager_id
-    },
-    function(err, res) {
-      if (err) throw err;
-      console.log(res.affectedRows + ' employee inserted!\n');
-    }
-  )
-}
-
-// View all employees 
-getRoles = () => {
-  connection.query('SELECT * FROM employees', function(err, res) {
-    if (err) throw err;
-    console.log(res);
-    connection.end();
-  });
-};
-
-inquirer
